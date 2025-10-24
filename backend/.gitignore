@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+.env.local
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.DS_Store
+generated_code/*
+!generated_code/.gitkeep
+idea.md
+plan.md
