@@ -5,6 +5,8 @@ const ChatInterface = ({ messages }) => {
     switch (role) {
       case 'user':
         return 'blue'
+      case 'architect':
+        return 'orange'
       case 'coder':
         return 'green'
       case 'tester':
@@ -20,6 +22,8 @@ const ChatInterface = ({ messages }) => {
     switch (role) {
       case 'user':
         return '👤'
+      case 'architect':
+        return '🏗️'
       case 'coder':
         return '💻'
       case 'tester':

@@ -238,3 +238,49 @@ body {
 .tab-content {
   padding: 32px;
 }
+
+.architecture-display {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.architecture-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.architecture-header {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  border-bottom: 3px solid #f59e0b;
+  padding-bottom: 12px;
+  margin-bottom: 8px;
+}
+
+.architecture-text {
+  background: #fffbf0;
+  border-left: 4px solid #f59e0b;
+  padding: 20px;
+  border-radius: 8px;
+  color: #2d2d2d;
+  line-height: 1.7;
+  font-size: 15px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  color: #9ca3af;
+  font-size: 16px;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border-radius: 8px;
+  border: 2px dashed #e5e7eb;
+}

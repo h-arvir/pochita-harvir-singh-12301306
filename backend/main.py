@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 import os
 from typing import List, Dict, Optional
 
+from agents.architect import ArchitectAgent
 from agents.coder import CoderAgent
 from agents.tester import TesterAgent
 from agents.conversation_manager import ConversationManager
@@ -35,6 +36,7 @@ app.add_middleware(
 )
 
 # Initialize agents
+architect_agent = ArchitectAgent()
 coder_agent = CoderAgent()
 tester_agent = TesterAgent()
 conversation_manager = ConversationManager()
@@ -94,6 +96,20 @@ async def generate(request: GenerateRequest):
             role="user",
             content=request.prompt,
             agent_type="user"
+        )
+        
+        conversation_manager.add_message(
+            role="system",
+            content="Architect agent is analyzing requirements...",
+            agent_type="system"
+        )
+        
+        architect_analysis = architect_agent.generate(request.prompt)
+        
+        conversation_manager.add_message(
+            role="architect",
+            content=architect_analysis,
+            agent_type="architect"
         )
         
         coder_prompt = f"{request.prompt}\n\nAdditional context: {request.description}" if request.description else request.prompt

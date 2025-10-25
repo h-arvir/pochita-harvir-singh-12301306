@@ -136,6 +136,12 @@ function App() {
           <div className="tabs-header">
             <div className="tabs">
               <button
+                className={`tab-btn ${activeTab === 'architecture' ? 'active' : ''}`}
+                onClick={() => setActiveTab('architecture')}
+              >
+                Architecture
+              </button>
+              <button
                 className={`tab-btn ${activeTab === 'code' ? 'active' : ''}`}
                 onClick={() => setActiveTab('code')}
               >
@@ -174,6 +180,20 @@ function App() {
           </div>
 
           <div className="tab-content">
+            {activeTab === 'architecture' && (
+              <div className="architecture-display">
+                {response.conversation && response.conversation.find(msg => msg.role === 'architect') ? (
+                  <div className="architecture-content">
+                    <div className="architecture-header">🏗️ Architecture Plan</div>
+                    <div className="architecture-text">
+                      {response.conversation.find(msg => msg.role === 'architect')?.content}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="empty-state">No architecture plan available</div>
+                )}
+              </div>
+            )}
             {activeTab === 'code' && (
               <CodeDisplay code={response.code} title="Generated Code" />
             )}
