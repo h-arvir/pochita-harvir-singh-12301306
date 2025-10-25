@@ -1,0 +1,247 @@
+.test-results-container {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.test-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 15px;
+}
+
+.header-title h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #111827;
+  font-weight: 600;
+}
+
+.summary-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.status-icon {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.status-text {
+  color: #374151;
+}
+
+.test-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.stat-box {
+  background: #f9fafb;
+  padding: 15px;
+  border-radius: 6px;
+  border-left: 4px solid #d1d5db;
+  text-align: center;
+}
+
+.stat-box.success {
+  border-left-color: #22c55e;
+}
+
+.stat-box.failed {
+  border-left-color: #ef4444;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.test-details {
+  margin-bottom: 25px;
+}
+
+.test-details h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #111827;
+  font-weight: 600;
+}
+
+.test-list {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.test-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  border-bottom: 1px solid #f3f4f6;
+  gap: 12px;
+  background: white;
+  transition: background-color 0.2s;
+}
+
+.test-item:last-child {
+  border-bottom: none;
+}
+
+.test-item:hover {
+  background: #f9fafb;
+}
+
+.test-item.passed {
+  border-left: 4px solid #22c55e;
+}
+
+.test-item.failed {
+  border-left: 4px solid #ef4444;
+}
+
+.test-status-icon {
+  font-weight: bold;
+  font-size: 16px;
+  min-width: 24px;
+}
+
+.test-item.passed .test-status-icon {
+  color: #22c55e;
+}
+
+.test-item.failed .test-status-icon {
+  color: #ef4444;
+}
+
+.test-name {
+  flex: 1;
+  color: #374151;
+  font-weight: 500;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.test-params {
+  color: #9ca3af;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+}
+
+.test-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.test-badge.passed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.test-badge.failed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.test-output,
+.test-error {
+  margin-bottom: 20px;
+}
+
+.test-output h3,
+.test-error h3 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #111827;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.output-box,
+.error-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 12px 15px;
+  border-radius: 6px;
+  margin: 0;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  color: #374151;
+  max-height: 300px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.error-box {
+  background: #fef2f2;
+  border-color: #fee2e2;
+  color: #7f1d1d;
+}
+
+.timeout-alert {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  padding: 12px 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.test-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 15px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.retry-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.retry-btn:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.retry-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+}

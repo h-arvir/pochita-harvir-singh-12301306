@@ -24,6 +24,12 @@ Code to Test:
 
 Requirements: {requirements}
 
+IMPORTANT:
+- DO NOT include import statements for the code being tested (it will be in the same file)
+- DO NOT use 'from your_module import' or similar
+- Only import pytest or other external libraries if needed
+- Assume all functions/classes from the code are already available in scope
+
 Generate pytest test cases with:
 - At least 3 test cases covering normal cases
 - Edge case tests (empty inputs, boundary values, None)
@@ -61,6 +67,7 @@ Generate ONLY the Python test code, no explanations or markdown:"""
             return "# Error: No tests generated"
         
         tests = self._extract_code_blocks(tests)
+        tests = self._remove_module_imports(tests)
         tests = self._ensure_pytest_import(tests)
         tests = self._validate_test_syntax(tests)
         tests = self._enhance_assertions(tests)
@@ -73,6 +80,20 @@ Generate ONLY the Python test code, no explanations or markdown:"""
         if code_block_match:
             return code_block_match.group(1).strip()
         return text
+    
+    def _remove_module_imports(self, tests: str) -> str:
+        """Remove problematic module imports that reference placeholder modules"""
+        lines = tests.split('\n')
+        filtered_lines = []
+        
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith('from ') and (' import ' in stripped):
+                if 'your_module' in stripped or 'module' in stripped.lower():
+                    continue
+            filtered_lines.append(line)
+        
+        return '\n'.join(filtered_lines)
     
     def _ensure_pytest_import(self, tests: str) -> str:
         """Ensure pytest is imported"""

@@ -8,12 +8,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 from agents.coder import CoderAgent
 from agents.tester import TesterAgent
 from agents.conversation_manager import ConversationManager
 from agents.executor import CodeExecutor
+from agents.result_parser import ResultParser
 
 # Load environment variables
 load_dotenv()
@@ -37,19 +38,29 @@ app.add_middleware(
 coder_agent = CoderAgent()
 tester_agent = TesterAgent()
 conversation_manager = ConversationManager()
+code_executor = CodeExecutor()
+
+current_code = ""
+current_tests = ""
+current_prompt = ""
 
 
 # Request/Response Models
 class GenerateRequest(BaseModel):
     prompt: str
-    description: str = ""
+    description: Optional[str] = ""
+
+
+class ExecuteRequest(BaseModel):
+    code: str
+    tests: str
 
 
 class Message(BaseModel):
     role: str
     content: str
-    agent_type: str = None
-    timestamp: str = None
+    agent_type: Optional[str] = None
+    timestamp: Optional[str] = None
 
 
 class GenerateResponse(BaseModel):
@@ -74,8 +85,10 @@ async def health_check():
 @app.post("/generate", response_model=GenerateResponse)
 async def generate(request: GenerateRequest):
     """Generate code and tests using AI agents"""
+    global current_code, current_tests, current_prompt
     try:
         conversation_manager.clear()
+        current_prompt = request.prompt
         
         conversation_manager.add_message(
             role="user",
@@ -92,6 +105,7 @@ async def generate(request: GenerateRequest):
         )
         
         generated_code = coder_agent.generate(coder_prompt)
+        current_code = generated_code
         
         conversation_manager.add_message(
             role="coder",
@@ -107,6 +121,7 @@ async def generate(request: GenerateRequest):
         
         test_requirements = f"Test the following code which implements: {request.prompt}"
         generated_tests = tester_agent.generate(generated_code, test_requirements)
+        current_tests = generated_tests
         
         conversation_manager.add_message(
             role="tester",
@@ -159,12 +174,105 @@ async def generate(request: GenerateRequest):
 
 
 @app.post("/execute")
-async def execute(code: str):
-    """Execute generated code"""
-    return {
-        "status": "not_implemented",
-        "message": "Execute endpoint coming in Day 2 Morning"
-    }
+async def execute(request: ExecuteRequest) -> dict:
+    """Execute code and tests with feedback loop"""
+    global current_code, current_tests
+    try:
+        current_code = request.code
+        current_tests = request.tests
+        
+        full_test_code = f"{request.code}\n\n{request.tests}"
+        
+        execution_result = code_executor.execute(full_test_code, test_mode=True)
+        
+        if execution_result["status"] == "timeout":
+            return {
+                "status": "error",
+                "execution_status": "timeout",
+                "output": "",
+                "error": execution_result["stderr"],
+                "test_summary": "Execution timed out",
+                "total_tests": 0,
+                "passed_tests": 0,
+                "failed_tests": 0,
+                "test_details": [],
+                "raw_output": execution_result["stderr"]
+            }
+        
+        if execution_result["status"] == "error":
+            return {
+                "status": "error",
+                "execution_status": "error",
+                "output": execution_result["stdout"],
+                "error": execution_result["stderr"],
+                "test_summary": "Execution error",
+                "total_tests": 0,
+                "passed_tests": 0,
+                "failed_tests": 0,
+                "test_details": [],
+                "raw_output": execution_result["stderr"]
+            }
+        
+        parsed_results = ResultParser.parse_test_results(
+            execution_result["stdout"] + execution_result["stderr"],
+            execution_result["returncode"]
+        )
+        
+        test_details = [
+            {
+                "name": detail["name"],
+                "status": detail["status"],
+                "params": detail.get("params", "")
+            }
+            for detail in parsed_results["test_details"]
+        ]
+        
+        response = {
+            "status": "success" if parsed_results["status"] == "passed" else "failed",
+            "execution_status": parsed_results["status"],
+            "output": execution_result["stdout"],
+            "error": execution_result["stderr"],
+            "test_summary": parsed_results["summary"],
+            "total_tests": parsed_results["total"],
+            "passed_tests": parsed_results["passed"],
+            "failed_tests": parsed_results["failed"],
+            "test_details": test_details,
+            "raw_output": execution_result["stdout"] + execution_result["stderr"]
+        }
+        
+        if ResultParser.should_retry(parsed_results) and current_prompt:
+            feedback_message = f"Tests failed:\n{parsed_results['summary']}\n\nOriginal code:\n{request.code}\n\nFailing tests:\n{request.tests}\n\nPlease fix the code to pass all tests."
+            
+            conversation_manager.add_message(
+                role="system",
+                content="Tests failed. Tester agent is debugging...",
+                agent_type="system"
+            )
+            
+            refined_tests = tester_agent.generate(request.code, feedback_message)
+            current_tests = refined_tests
+            
+            conversation_manager.add_message(
+                role="tester",
+                content=f"Refined tests after feedback:\n{refined_tests}",
+                agent_type="tester"
+            )
+        
+        return response
+    
+    except Exception as e:
+        return {
+            "status": "error",
+            "execution_status": "error",
+            "output": "",
+            "error": str(e),
+            "test_summary": "Error during execution",
+            "total_tests": 0,
+            "passed_tests": 0,
+            "failed_tests": 0,
+            "test_details": [],
+            "raw_output": str(e)
+        }
 
 
 if __name__ == "__main__":
