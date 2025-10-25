@@ -13,3 +13,5 @@ generated_code/*
 !generated_code/.gitkeep
 idea.md
 plan.md
+.env.example
+node_modules

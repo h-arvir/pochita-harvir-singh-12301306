@@ -47,14 +47,14 @@ pochita/
   - [x] Agent boilerplates
   - [x] Environment setup
 
-- **Day 1 Afternoon** 🔄 Core Backend
-  - [ ] Implement `/generate` endpoint
-  - [ ] Coder & Tester agent logic
+- **Day 1 Afternoon** ✅ Core Backend
+  - [x] Implement `/generate` endpoint
+  - [x] Coder & Tester agent logic
 
-- **Day 1 Evening** ⏳ Frontend & Integration
-  - [ ] React + Chakra UI setup
-  - [ ] Chat interface
-  - [ ] Backend integration
+- **Day 1 Evening** ✅ Frontend & Integration
+  - [x] React + Chakra UI setup
+  - [x] Chat interface
+  - [x] Backend integration
 
 - **Day 2 Morning** ⏳ Code Execution & Polish
   - [ ] Implement `/execute` endpoint
@@ -88,4 +88,4 @@ pochita/
 
 ---
 
-**Current Phase**: Day 1 Morning - Setup & Planning ✅
+**Current Phase**: Day 1 Evening - Frontend & Integration ✅
