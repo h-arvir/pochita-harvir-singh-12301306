@@ -18,23 +18,6 @@ const ChatInterface = ({ messages }) => {
     }
   }
 
-  const getRoleEmoji = (role) => {
-    switch (role) {
-      case 'user':
-        return '👤'
-      case 'architect':
-        return '🏗️'
-      case 'coder':
-        return '💻'
-      case 'tester':
-        return '🧪'
-      case 'system':
-        return '⚙️'
-      default:
-        return '📝'
-    }
-  }
-
   return (
     <div className="chat-interface">
       {messages && messages.length > 0 ? (
@@ -48,7 +31,7 @@ const ChatInterface = ({ messages }) => {
           >
             <div className="message-header">
               <span className={`badge badge-${getRoleColor(msg.role)}`}>
-                {getRoleEmoji(msg.role)} {msg.role.toUpperCase()}
+                {msg.role.toUpperCase()}
               </span>
               {msg.timestamp && (
                 <span className="timestamp">

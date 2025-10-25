@@ -6,7 +6,6 @@ export default function TestResults({ results, onExecute, code, tests, isExecuti
   }
 
   const statusColor = results.status === 'success' ? '#22c55e' : '#ef4444'
-  const statusIcon = results.status === 'success' ? '✓' : '✗'
 
   const handleRetry = async () => {
     if (onExecute) {
@@ -21,9 +20,6 @@ export default function TestResults({ results, onExecute, code, tests, isExecuti
           <h2>Test Results</h2>
         </div>
         <div className="summary-badge" style={{ borderColor: statusColor }}>
-          <span className="status-icon" style={{ color: statusColor }}>
-            {statusIcon}
-          </span>
           <span className="status-text">{results.test_summary}</span>
         </div>
       </div>
@@ -53,9 +49,6 @@ export default function TestResults({ results, onExecute, code, tests, isExecuti
           <div className="test-list">
             {results.test_details.map((test, idx) => (
               <div key={idx} className={`test-item ${test.status}`}>
-                <span className="test-status-icon">
-                  {test.status === 'passed' ? '✓' : test.status === 'failed' ? '✗' : '⚠'}
-                </span>
                 <span className="test-name">{test.name}</span>
                 {test.params && <span className="test-params">[{test.params}]</span>}
                 <span className={`test-badge ${test.status}`}>{test.status}</span>

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import ChatInterface from './components/ChatInterface'
+import ArchitectDisplay from './components/ArchitectDisplay'
 import CodeDisplay from './components/CodeDisplay'
 import TestResults from './components/TestResults'
 import './App.css'
@@ -12,7 +13,8 @@ function App() {
   const [error, setError] = useState('')
   const [response, setResponse] = useState(null)
   const [testResults, setTestResults] = useState(null)
-  const [activeTab, setActiveTab] = useState('code')
+  const [activeTab, setActiveTab] = useState('architecture')
+  const [expandedAgent, setExpandedAgent] = useState(null)
 
   const handleGenerate = async (e) => {
     e.preventDefault()
@@ -94,8 +96,7 @@ function App() {
   return (
     <div className="app-container">
       <div className="header">
-        <h1>🐕 Pochita</h1>
-        <h3>AI Code Generation & Testing Platform</h3>
+        <h1>POCHITA</h1>
       </div>
 
       <div className="form-container">
@@ -138,24 +139,28 @@ function App() {
               <button
                 className={`tab-btn ${activeTab === 'architecture' ? 'active' : ''}`}
                 onClick={() => setActiveTab('architecture')}
+                title="View architectural analysis"
               >
                 Architecture
               </button>
               <button
                 className={`tab-btn ${activeTab === 'code' ? 'active' : ''}`}
                 onClick={() => setActiveTab('code')}
+                title="View generated code"
               >
-                Generated Code
+                Code
               </button>
               <button
                 className={`tab-btn ${activeTab === 'tests' ? 'active' : ''}`}
                 onClick={() => setActiveTab('tests')}
+                title="View generated tests"
               >
-                Generated Tests
+                Tests
               </button>
               <button
                 className={`tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
                 onClick={() => setActiveTab('chat')}
+                title="View agent conversation"
               >
                 Conversation
               </button>
@@ -163,8 +168,9 @@ function App() {
                 <button
                   className={`tab-btn ${activeTab === 'results' ? 'active' : ''}`}
                   onClick={() => setActiveTab('results')}
+                  title="View test results"
                 >
-                  Test Results
+                  Results
                 </button>
               )}
             </div>
@@ -174,25 +180,14 @@ function App() {
                 onClick={handleExecute}
                 disabled={executing || activeTab === 'results'}
               >
-                {executing ? 'Running Tests...' : '▶ Run Tests'}
+                {executing ? 'Running...' : 'Run Tests'}
               </button>
             </div>
           </div>
 
           <div className="tab-content">
             {activeTab === 'architecture' && (
-              <div className="architecture-display">
-                {response.conversation && response.conversation.find(msg => msg.role === 'architect') ? (
-                  <div className="architecture-content">
-                    <div className="architecture-header">🏗️ Architecture Plan</div>
-                    <div className="architecture-text">
-                      {response.conversation.find(msg => msg.role === 'architect')?.content}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="empty-state">No architecture plan available</div>
-                )}
-              </div>
+              <ArchitectDisplay messages={response.conversation && response.conversation.filter(msg => msg.role === 'architect')} />
             )}
             {activeTab === 'code' && (
               <CodeDisplay code={response.code} title="Generated Code" />

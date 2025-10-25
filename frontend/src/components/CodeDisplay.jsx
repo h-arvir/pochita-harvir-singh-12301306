@@ -17,9 +17,12 @@ const CodeDisplay = ({ code, language = 'python', title = 'Code' }) => {
   return (
     <div className="code-display">
       <div className="code-header">
-        <h3>{title}</h3>
-        <button onClick={handleCopy} className="copy-btn">
-          {hasCopied ? '✓ Copied!' : '📋 Copy'}
+        <div className="code-title-section">
+          <h3>{title}</h3>
+          <span className="code-language">Python</span>
+        </div>
+        <button onClick={handleCopy} className={`copy-btn ${hasCopied ? 'copied' : ''}`}>
+          {hasCopied ? 'Copied' : 'Copy Code'}
         </button>
       </div>
 
