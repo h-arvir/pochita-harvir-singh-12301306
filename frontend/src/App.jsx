@@ -99,29 +99,31 @@ function App() {
         <h1>POCHITA</h1>
       </div>
 
-      <div className="form-container">
-        <form onSubmit={handleGenerate}>
-          <input
-            type="text"
-            placeholder="Enter your code generation request..."
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            disabled={loading}
-            className="input-field"
-          />
-          <input
-            type="text"
-            placeholder="(Optional) Additional description or requirements..."
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            disabled={loading}
-            className="input-field input-secondary"
-          />
-          <button type="submit" disabled={loading} className="submit-btn">
-            {loading ? 'Generating...' : 'Generate Code'}
-          </button>
-        </form>
-      </div>
+      {!loading && !response && (
+        <div className="form-container">
+          <form onSubmit={handleGenerate}>
+            <input
+              type="text"
+              placeholder="Enter your code generation request..."
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              disabled={loading}
+              className="input-field"
+            />
+            <input
+              type="text"
+              placeholder="(Optional) Additional description or requirements..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={loading}
+              className="input-field input-secondary"
+            />
+            <button type="submit" disabled={loading} className="submit-btn">
+              {loading ? 'Generating...' : 'Generate Code'}
+            </button>
+          </form>
+        </div>
+      )}
 
       {error && <div className="error-alert">{error}</div>}
 
