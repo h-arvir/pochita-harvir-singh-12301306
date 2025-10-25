@@ -4,6 +4,7 @@ import ChatInterface from './components/ChatInterface'
 import ArchitectDisplay from './components/ArchitectDisplay'
 import CodeDisplay from './components/CodeDisplay'
 import TestResults from './components/TestResults'
+import DocumentationDisplay from './components/DocumentationDisplay'
 import './App.css'
 
 function App() {
@@ -191,6 +192,13 @@ function App() {
                 Tests
               </button>
               <button
+                className={`tab-btn ${activeTab === 'documentation' ? 'active' : ''}`}
+                onClick={() => setActiveTab('documentation')}
+                title="View generated documentation"
+              >
+                Documentation
+              </button>
+              <button
                 className={`tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
                 onClick={() => setActiveTab('chat')}
                 title="View agent conversation"
@@ -227,6 +235,12 @@ function App() {
             )}
             {activeTab === 'tests' && (
               <CodeDisplay code={response.tests} title="Generated Tests" />
+            )}
+            {activeTab === 'documentation' && (
+              <DocumentationDisplay
+                documentation={response.documentation}
+                markdown={response.documentation_markdown}
+              />
             )}
             {activeTab === 'chat' && (
               <ChatInterface messages={response.conversation} />

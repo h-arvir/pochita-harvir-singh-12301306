@@ -13,6 +13,7 @@ from typing import List, Dict, Optional
 from agents.architect import ArchitectAgent
 from agents.coder import CoderAgent
 from agents.tester import TesterAgent
+from agents.documentation import DocumentationAgent
 from agents.conversation_manager import ConversationManager
 from agents.executor import CodeExecutor
 from agents.result_parser import ResultParser
@@ -39,12 +40,14 @@ app.add_middleware(
 architect_agent = ArchitectAgent()
 coder_agent = CoderAgent()
 tester_agent = TesterAgent()
+documentation_agent = DocumentationAgent()
 conversation_manager = ConversationManager()
 code_executor = CodeExecutor()
 
 current_code = ""
 current_tests = ""
 current_prompt = ""
+current_documentation = {}
 
 
 # Request/Response Models
@@ -69,7 +72,20 @@ class GenerateResponse(BaseModel):
     status: str
     code: str
     tests: str
+    documentation: Dict
+    documentation_markdown: Optional[str] = None
     conversation: List[Message]
+
+
+class DocumentationRequest(BaseModel):
+    code: str
+    prompt: str = ""
+
+
+class DocumentationResponse(BaseModel):
+    status: str
+    documentation: Dict
+    markdown: Optional[str] = None
 
 
 # Health Check Endpoint
@@ -145,6 +161,28 @@ async def generate(request: GenerateRequest):
             agent_type="tester"
         )
         
+        conversation_manager.add_message(
+            role="system",
+            content="Documentation agent is generating documentation...",
+            agent_type="system"
+        )
+        
+        doc_result = documentation_agent.generate(generated_code, request.prompt)
+        
+        doc_status = doc_result.get("status", "unknown")
+        doc_overview = doc_result.get("documentation", {}).get("overview", "")[:50]
+        conversation_manager.add_message(
+            role="documentation",
+            content=f"Documentation generated (status: {doc_status})",
+            agent_type="documentation"
+        )
+        
+        doc_markdown = None
+        if doc_result["status"] == "success":
+            doc_markdown = documentation_agent.format_documentation_as_markdown(doc_result)
+        else:
+            print(f"[WARNING] Documentation generation failed: {doc_result.get('documentation', {}).get('overview', '')[:100]}")
+        
         history = conversation_manager.get_history()
         messages = [
             Message(
@@ -160,6 +198,8 @@ async def generate(request: GenerateRequest):
             status="success",
             code=generated_code,
             tests=generated_tests,
+            documentation=doc_result.get("documentation"),
+            documentation_markdown=doc_markdown,
             conversation=messages
         )
     
@@ -185,6 +225,16 @@ async def generate(request: GenerateRequest):
             status="error",
             code=f"# Error: {str(e)}",
             tests=f"# Error: {str(e)}",
+            documentation={
+                "overview": f"Error generating documentation: {str(e)}",
+                "usage_examples": [],
+                "installation": {"requirements": [], "steps": []},
+                "dependencies": [],
+                "configuration": {"environment_variables": [], "config_file_example": "", "settings": []},
+                "running_locally": {"prerequisites": [], "setup_steps": [], "verification": ""},
+                "architecture": {"description": "", "components": [], "ascii_diagram": "", "data_flow": ""}
+            },
+            documentation_markdown=None,
             conversation=messages
         )
 
@@ -289,6 +339,63 @@ async def execute(request: ExecuteRequest) -> dict:
             "test_details": [],
             "raw_output": str(e)
         }
+
+
+@app.post("/generate-documentation", response_model=DocumentationResponse)
+async def generate_documentation(request: DocumentationRequest):
+    """Generate comprehensive documentation for code"""
+    global current_documentation
+    try:
+        result = documentation_agent.generate(request.code, request.prompt)
+        current_documentation = result
+        
+        markdown = None
+        if result["status"] == "success":
+            markdown = documentation_agent.format_documentation_as_markdown(result)
+        
+        conversation_manager.add_message(
+            role="documentation",
+            content=f"Documentation generated for provided code",
+            agent_type="documentation"
+        )
+        
+        return DocumentationResponse(
+            status=result["status"],
+            documentation=result["documentation"],
+            markdown=markdown
+        )
+    except Exception as e:
+        return DocumentationResponse(
+            status="error",
+            documentation={
+                "overview": f"Error generating documentation: {str(e)}",
+                "usage_examples": [],
+                "installation": {"requirements": [], "steps": []},
+                "dependencies": [],
+                "configuration": {"environment_variables": [], "config_file_example": "", "settings": []},
+                "running_locally": {"prerequisites": [], "setup_steps": [], "verification": ""},
+                "architecture": {"description": "", "components": [], "ascii_diagram": "", "data_flow": ""}
+            },
+            markdown=None
+        )
+
+
+@app.get("/documentation")
+async def get_documentation():
+    """Retrieve the current documentation"""
+    if not current_documentation:
+        return {
+            "status": "no_documentation",
+            "message": "No documentation generated yet"
+        }
+    
+    markdown = documentation_agent.format_documentation_as_markdown(current_documentation)
+    
+    return {
+        "status": "success",
+        "documentation": current_documentation.get("documentation", {}),
+        "markdown": markdown
+    }
 
 
 if __name__ == "__main__":
