@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './CodeDisplay.css'
 
-const CodeDisplay = ({ code, language = 'python', title = 'Code' }) => {
+const CodeDisplay = ({ code, language = 'python', title = 'Code', onDownload = null }) => {
   const [hasCopied, setHasCopied] = useState(false)
 
   const handleCopy = async () => {
@@ -21,9 +21,16 @@ const CodeDisplay = ({ code, language = 'python', title = 'Code' }) => {
           <h3>{title}</h3>
           <span className="code-language">Python</span>
         </div>
-        <button onClick={handleCopy} className={`copy-btn ${hasCopied ? 'copied' : ''}`}>
-          {hasCopied ? 'Copied' : 'Copy Code'}
-        </button>
+        <div className="code-actions">
+          <button onClick={handleCopy} className={`copy-btn ${hasCopied ? 'copied' : ''}`}>
+            {hasCopied ? 'Copied' : 'Copy Code'}
+          </button>
+          {onDownload && title === 'Generated Code' && (
+            <button onClick={onDownload} className="download-btn" title="Download code as zip">
+              Download Zip
+            </button>
+          )}
+        </div>
       </div>
 
       <pre className="code-block">

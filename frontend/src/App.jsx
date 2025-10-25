@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import JSZip from 'jszip'
 import ChatInterface from './components/ChatInterface'
 import ArchitectDisplay from './components/ArchitectDisplay'
 import CodeDisplay from './components/CodeDisplay'
@@ -93,10 +94,40 @@ function App() {
     }
   }
 
+  const handleDownloadZip = async () => {
+    try {
+      const zip = new JSZip()
+      zip.file('main.py', response.code)
+      zip.file('test.py', response.tests)
+
+      const blob = await zip.generateAsync({ type: 'blob' })
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'generated_code.zip')
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      setError(`Error downloading zip: ${err.message}`)
+      console.error('Zip download error:', err)
+    }
+  }
+
+  const handleHeaderClick = () => {
+    setPrompt('')
+    setDescription('')
+    setResponse(null)
+    setTestResults(null)
+    setError('')
+    setActiveTab('architecture')
+  }
+
   return (
     <div className="app-container">
       <div className="header">
-        <h1>POCHITA</h1>
+        <h1 onClick={handleHeaderClick} style={{ cursor: 'pointer' }}>POCHITA</h1>
       </div>
 
       {!loading && !response && (
@@ -192,7 +223,7 @@ function App() {
               <ArchitectDisplay messages={response.conversation && response.conversation.filter(msg => msg.role === 'architect')} />
             )}
             {activeTab === 'code' && (
-              <CodeDisplay code={response.code} title="Generated Code" />
+              <CodeDisplay code={response.code} title="Generated Code" onDownload={handleDownloadZip} />
             )}
             {activeTab === 'tests' && (
               <CodeDisplay code={response.tests} title="Generated Tests" />
