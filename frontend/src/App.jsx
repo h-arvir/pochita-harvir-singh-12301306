@@ -6,6 +6,8 @@ import CodeDisplay from './components/CodeDisplay'
 import TestResults from './components/TestResults'
 import './App.css'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
 function App() {
   const [prompt, setPrompt] = useState('')
   const [description, setDescription] = useState('')
@@ -30,7 +32,7 @@ function App() {
     setTestResults(null)
 
     try {
-      const res = await fetch('http://localhost:8000/generate', {
+      const res = await fetch(`${API_URL}/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,7 +70,7 @@ function App() {
     setTestResults(null)
 
     try {
-      const res = await fetch('http://localhost:8000/execute', {
+      const res = await fetch(`${API_URL}/execute`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
