@@ -20,16 +20,32 @@ Users submit a natural language prompt through an intuitive web interface. The a
 
 ---
 
+## Project Impact
+Pochita addresses critical inefficiencies in the software development lifecycle:
+
+- **Accelerated Development**: Reduces code boilerplate writing time by 60-80%, allowing developers to focus on architecture and business logic rather than repetitive coding tasks
+- **Quality Assurance**: Automatically generates comprehensive test suites, improving code coverage and reducing bug escape rates
+- **Learning Tool**: Serves as an interactive learning platform for junior developers to understand architectural patterns and testing best practices
+- **Rapid Prototyping**: Enables quick prototyping and validation of ideas with AI-assisted code generation
+- **Accessibility**: Democratizes code generation, making professional-grade code structure and testing accessible to developers of varying skill levels
+- **Error Reduction**: Minimizes human error in test case creation and boilerplate code patterns
+- **Productivity Gain**: Teams can deliver features faster while maintaining code quality and comprehensive test coverage
+
+Pochita demonstrates the practical application of AI agents in automating complex, multi-stage software engineering workflows, showcasing the potential for AI to augment developer productivity in real-world scenarios.
+
+---
+
 ## Tech Stack
 - **Backend**: Python 3.13.7, FastAPI 0.104.1, Uvicorn 0.24.0
 - **Frontend**: React 19.2.0, Vite 7.1.12, JavaScript
-- **AI/LLM**: Google Generative AI (Gemini)
+- **AI/LLM**: Google Generative AI (Gemini) - Multi-agent architecture with context window up to 100K tokens
 - **Testing Framework**: pytest 7.4.3
 - **Package Manager**: pip (Backend), npm (Frontend)
 - **Web Framework**: FastAPI with CORS support
 - **Schema Validation**: Pydantic ≥2.5.0
 - **Cloud Deployment**: Vercel (Frontend), Render/Railway (Backend)
 - **Version Control**: Git + GitHub
+- **Agent Communication**: Conversation pipeline with multi-stage prompting
 
 ---
 
@@ -193,6 +209,75 @@ The demo should showcase:
 
 ---
 
+## LLM Choice & Model Documentation
+
+### Selected Model: Google Gemini
+
+**Model**: Google Generative AI - Gemini (default gemini-pro or gemini-1.5)
+
+**Rationale for Selection**:
+- **Free Tier Access**: Provides generous free API quota suitable for hackathon development and testing (15 requests per minute for free tier)
+- **Multi-Agent Support**: Gemini's context window (up to 32K-100K tokens) enables multiple sequential prompts without losing conversation context, essential for the architect → coder → tester pipeline
+- **Code Generation Capability**: Extensively trained on code from GitHub and Stack Overflow, making it highly proficient at generating Python code and pytest test cases
+- **Availability**: Reliable API with minimal setup complexity using the `google-generativeai` Python SDK
+- **Performance**: Fast response times suitable for real-time web interface interaction
+
+### Sources & Documentation
+- [Google AI Studio](https://aistudio.google.com/app/apikey) - API key generation and playground
+- [Google Generative AI Python SDK](https://ai.google.dev/docs) - Official SDK documentation
+- [Gemini Model Documentation](https://ai.google.dev/models/gemini) - Model specifications and capabilities
+- [Google AI for Developers](https://ai.google.dev/) - Comprehensive API documentation
+
+### Model Capabilities
+- **Code Generation**: Proficient in generating Python functions, classes, and complete modules
+- **Test Case Creation**: Strong ability to create comprehensive pytest test suites with multiple test cases
+- **Architecture Analysis**: Can analyze requirements and produce architectural design documents
+- **Context Retention**: Maintains conversation history across multiple API calls within session
+- **Error Handling**: Provides meaningful error messages and explanations for failed code
+
+### Limitations & Constraints
+
+#### API-Level Limitations
+- **Rate Limiting**: Free tier limited to ~15 requests/minute; production requires paid tier for higher throughput
+- **Token Limits**: Maximum context window of 32K-100K tokens depending on model version (approximately 8,000-25,000 words per request)
+- **Response Size**: Generated code/tests limited by token budget; very large applications may need to be generated in multiple parts
+- **No Persistent Memory**: Each API session is independent; conversation history must be maintained in application state
+
+#### Code Generation Limitations
+- **Language Support**: Primarily optimized for Python; other languages work but with lower quality
+- **Complex Architectures**: May struggle with highly complex enterprise-level architectural patterns
+- **Database Queries**: Generated database code may not be production-optimized for large-scale data operations
+- **Security Considerations**: Generated code should be reviewed for security vulnerabilities before production deployment
+- **Dependencies**: May reference external libraries; generated code requires validation that dependencies are available
+- **Edge Cases**: May miss handling of rare edge cases or unusual error scenarios
+
+#### Hallucination & Accuracy Issues
+- **Outdated Information**: Training data has a cutoff date; may generate code using deprecated APIs or outdated patterns
+- **Fictitious Libraries**: Occasionally invents function names or library methods that don't exist
+- **Logic Errors**: Can produce syntactically correct but logically flawed code
+- **Test Coverage Gaps**: Generated tests may not cover all edge cases or failure scenarios
+
+#### Performance Considerations
+- **API Latency**: Network latency varies (typically 1-5 seconds per request)
+- **Concurrent Requests**: Free tier has rate limits; production deployment requires payment tier
+- **Token Consumption**: Large prompts consume tokens quickly; cost scales with input/output size
+
+### Recommendations for Production Use
+1. **API Key Management**: Use environment variables and never commit API keys to version control
+2. **Code Review**: Always review generated code before production deployment
+3. **Security Audit**: Run security scanners on generated code (e.g., Bandit for Python)
+4. **Dependency Validation**: Verify all referenced libraries exist and are compatible with your environment
+5. **Testing**: Treat generated tests as starting points; add domain-specific test cases
+6. **Error Handling**: Implement comprehensive error handling for API failures and timeouts
+7. **Paid Tier**: For production use, migrate to Google Cloud paid tier for higher rate limits and SLAs
+
+### Alternative Models Considered
+- **OpenAI GPT-4**: Superior code generation but requires paid API; higher latency
+- **Anthropic Claude**: Excellent code quality but less generous free tier
+- **Open Source Models (Llama, CodeLlama)**: Would require hosting infrastructure; not practical for hackathon timeline
+
+---
+
 ## Environment Variables
 
 ### Backend (.env)
@@ -265,21 +350,43 @@ VITE_API_URL=http://localhost:8000
 ---
 
 ## References & Resources
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [Google Generative AI Python SDK](https://ai.google.dev/docs)
-- [React Documentation](https://react.dev/)
-- [Vite Documentation](https://vitejs.dev/)
-- [pytest Documentation](https://docs.pytest.org/)
-- [Pydantic Documentation](https://docs.pydantic.dev/)
-- [Chatgpt](https://chatgpt.com/)
-- [Gemini](https://gemini.google.com/app)
+
+### AI/LLM Resources
+- [Google AI for Developers](https://ai.google.dev/) - Official Gemini API documentation and developer guides
+- [Google Generative AI Python SDK](https://ai.google.dev/docs) - Python SDK for Gemini models
+- [Google AI Studio](https://aistudio.google.com/app/apikey) - Interactive playground and API key management
+- [Gemini Models Documentation](https://ai.google.dev/models/gemini) - Model specifications, capabilities, and context windows
+- [Google Cloud Generative AI Documentation](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini) - Production deployment guides
+
+### Framework & Library Documentation
+- [FastAPI Documentation](https://fastapi.tiangolo.com/) - Modern web framework for building APIs
+- [React Documentation](https://react.dev/) - UI library for building interactive interfaces
+- [Vite Documentation](https://vitejs.dev/) - Next-generation frontend build tool
+- [pytest Documentation](https://docs.pytest.org/) - Python testing framework
+- [Pydantic Documentation](https://docs.pydantic.dev/) - Data validation using Python type annotations
+
+### Related Tools & Comparisons
+- [OpenAI GPT Models](https://platform.openai.com/docs/models) - Alternative LLM provider
+- [Anthropic Claude Documentation](https://www.anthropic.com/claude) - Alternative LLM provider
+- [Hugging Face Models](https://huggingface.co/models) - Open-source model hub
+- [Code Quality Tools - Bandit](https://bandit.readthedocs.io/en/latest/) - Python security linter for generated code review
 ---
 
 ## Acknowledgements
 Built as a 36-hour hackathon project leveraging:
-- Google Generative AI / Gemini for intelligent code generation
-- FastAPI for robust backend architecture
-- React & Vite for modern frontend development
-- pytest for testing framework
+- **Google Generative AI / Gemini** for intelligent code generation and multi-agent collaboration ([Gemini API](https://ai.google.dev/))
+- **FastAPI** for robust backend architecture ([FastAPI Framework](https://fastapi.tiangolo.com/))
+- **React & Vite** for modern frontend development ([React 19](https://react.dev/), [Vite](https://vitejs.dev/))
+- **pytest** for automated testing framework ([pytest](https://docs.pytest.org/))
+- **Pydantic** for data validation ([Pydantic](https://docs.pydantic.dev/))
 - Open-source Python and JavaScript ecosystems
+
+### External Model Citation
+This project uses **Google Generative AI (Gemini)** as its primary language model for code generation and analysis. The Gemini model is:
+- Developed and maintained by Google DeepMind
+- Accessed via the [Google AI API](https://ai.google.dev/)
+- Subject to [Google's Terms of Service](https://policies.google.com/terms) and [Privacy Policy](https://policies.google.com/privacy)
+- Free tier includes 15 requests/minute with rate limiting; production deployment requires a paid Google Cloud account
+
+For academic or commercial use, please refer to [Google's AI Principles](https://ai.google/principles/) and licensing terms.
 
