@@ -72,6 +72,16 @@ class GenerateResponse(BaseModel):
     conversation: List[Message]
 
 
+# Root Endpoint
+@app.get("/")
+async def root():
+    """Root endpoint"""
+    return {
+        "status": "ok",
+        "message": "Pochita API"
+    }
+
+
 # Health Check Endpoint
 @app.get("/health")
 async def health_check():
@@ -293,4 +303,5 @@ async def execute(request: ExecuteRequest) -> dict:
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
